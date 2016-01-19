@@ -4,7 +4,7 @@
 # Why TurboMQ is developed?
 First, I want to explain why a new message queue system is developed. There are many message queue systems available and some of them are popular and stable like **RabbitMQ** or **ZMQ**. The most important reason behind this implementation is that most of message queue systems are designed to handle backend processing like distributing jobs between nodes to process huge amount of data or just complete the remained part of a business transaction. Certainly, TurboMQ can be used to distribute works between nodes. Moreover, it originally designed to support millions of providers and consumers working with millions of queues and topics.
 
-The most close (as queue functionality) system is **Redis**. It has a remarkable IO mechanism to handle network connections. However, it can just utilize one core for one instance. Do we really want to use just one core of for example 8 available cores? Or do we want to configure clustering inside one machine to just use all the available cores?
+The most close (as queue functionality) system is **Redis**. It has a remarkable IO mechanism to handle network connections. However, it can just utilize one core for one instance. Do we really want to use just one core of for example 8 available cores? Or do we want to configure clustering inside one machine to just use all available cores?
 **ZMQ** is a good library. It is fast, stable and useful for many purposes. Nonetheless, there is a serious problem in topic-based PUB-SUB queues. The consumers (subscribers) has to be connected before providers [(missing message problem solver)](http://zguide.zeromq.org/page:all#Missing-Message-Problem-Solver) otherwise the message is going to be lost.
 
 # Technical information
@@ -12,7 +12,10 @@ The most close (as queue functionality) system is **Redis**. It has a remarkable
 
 # Installation
 Installation is easy. You need to download or clone it and then type the python magic:
-> sudo python setup.py install
+
+```bash
+$ sudo python setup.py install
+```
 
 # Usage
 To use **TurboMQ** just import and run the server. The following code runs a server for 10 minutes.
@@ -59,7 +62,7 @@ print(q.pop('hello', 2))
 
 It is possible to produce message in client-side and consume it in server-side and vice versa:
 
-Server code:
+**Server code:**
 ```python
 from turbomq import TurboEngine
 import time
@@ -77,7 +80,7 @@ while True:
     # Waits a second for message.
     m = q.pop('hello', 1)
     if m is not None:
-        print('Message received:', m.content)
+        print('Client says:'+ m.content)
         # Puts a new message for client in another topic.
         q.push('hello', 'Hi Client.')
         break
@@ -90,7 +93,7 @@ e.stop()
 e.destroy()
 ```
 
-**Client code**:
+**Client code:**
 ```python
 from turbomq import TurboClient
 
@@ -104,5 +107,6 @@ q = c.get_queue('test')
 q.push('hello', 'Hi Server.')
 
 # Waits one seconds to pop server message
-print('Message:', q.pop('hello', 1))
+m = q.pop('hello', 1)
+print('Server says:' + m.content)
 ```
