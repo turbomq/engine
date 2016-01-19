@@ -20,10 +20,21 @@ To use **TurboMQ** just import and run the server. The following code runs a ser
 ```python
 from turbomq import TurboEngine
 import time
+
+# You can pass the thread count as a second parameter.
+# Otherwise, it will automatically selects 4 threads per core.
 e = TurboEngine('tcp://127.0.0.1:33444')
+
 e.run()
+# "run" method will not block the main thread.
+# So you need to simply wait or run your own loop as you want.
 time.sleep(10.0 * 60)
+
+# "stop" method just shuts TCP sockets down.
 e.stop()
+
+# After destroy all resources will be freed.
+# Then you can not use this instance anymore.
 e.destroy()
 ```
 
@@ -31,10 +42,67 @@ This code sends a message to server and receives it again.
 
 ```python
 from turbomq import TurboClient
+
+# Connects to the server.
 c = TurboClient('tcp://127.0.0.1:33444')
-q = c.declare_queue('test')
-q.push('hello', 'turbo') # Both topic key and data is mandatory in push
-print(q.pop('hello', 1)) # In pop you need to determine a timeout
+
+# Creates a mirror queue in client side.
+q = c.get_queue('test')
+
+# Both topic key and data is mandatory in push.
+q.push('hello', 'turbo')
+
+# In pop you need to determine a timeout.
+# So this will wait two seconds. If timeout is exceeded, it will return None.
+print(q.pop('hello', 2))
 ```
 
-# Future
+It is possible to produce message in client-side and consume it in server-side and vice versa:
+
+Server code:
+```python
+from turbomq import TurboEngine
+import time
+
+e = TurboEngine('tcp://127.0.0.1:33444')
+
+# Makes engine ready to serve to remote clients.
+e.run()
+
+# Creates a queue in server side.
+q = e.get_queue('test')
+
+# Waits to consume client commands.
+while True:
+    # Waits a second for message.
+    m = q.pop('hello', 1)
+    if m is not None:
+        print('Message received:', m.content)
+        # Puts a new message for client in another topic.
+        q.push('hello', 'Hi Client.')
+        break
+
+# Waits for example 2.0 seconds.
+time.sleep(2.0)
+
+# Cleanups and shuts engine down.
+e.stop()
+e.destroy()
+```
+
+**Client code**:
+```python
+from turbomq import TurboClient
+
+# Connects to the server.
+c = TurboClient('tcp://127.0.0.1:33444')
+
+# Creates a mirror queue in client side.
+q = c.get_queue('test')
+
+# Sends the message to server.
+q.push('hello', 'Hi Server.')
+
+# Waits one seconds to pop server message
+print('Message:', q.pop('hello', 1))
+```
