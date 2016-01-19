@@ -23,7 +23,7 @@
 #include "in_stream.h"
 #include "utils.h"
 
-typedef struct 
+typedef struct
 {
     turbo_in_stream_t parent;
     int fd;
@@ -109,7 +109,7 @@ size_t turbo_in_stream_recv(turbo_in_stream_t* base)
     register int32_t* size = (int32_t*)&stream->header.all[1];
     if(stream->header_pos < sizeof(stream->header.all))
     {
-        read_size = recv_all(stream->fd, 
+        read_size = recv_all(stream->fd,
                              &stream->header.all[stream->header_pos],
                              sizeof(stream->header.all) - stream->header_pos);
         if(read_size < 0)
@@ -135,8 +135,8 @@ size_t turbo_in_stream_recv(turbo_in_stream_t* base)
     }
     if(stream->body_pos < *size)
     {
-        read_size = recv_all(stream->fd, 
-                             &stream->body[stream->body_pos], 
+        read_size = recv_all(stream->fd,
+                             &stream->body[stream->body_pos],
                              *size - stream->body_pos);
         if(read_size < 0)
         {
@@ -235,4 +235,36 @@ int turbo_in_stream_read_int64(turbo_in_stream_t* base, int64_t* dest)
     }
     *dest = convert_int64(stream->header.endian, *dest);
     return 0;
+}
+
+/*
+ * Reads a message from stream.
+ */
+turbo_message_t* turbo_in_stream_read_message(turbo_in_stream_t* base)
+{
+    int32_t size;
+    int8_t error;
+    int64_t address;
+    void* data;
+
+    error = 0;
+    if(turbo_in_stream_read(base, &error, sizeof(error)) == -1)
+    {
+        return NULL;
+    }
+    if(turbo_in_stream_read_int64(base, &address) == -1)
+    {
+        return NULL;
+    }
+    if(turbo_in_stream_read_int32(base, &size) == -1)
+    {
+        return NULL;
+    }
+    data = malloc((size_t)size);
+    if(turbo_in_stream_read(base, data, size) == -1)
+    {
+        free(data);
+        return NULL;
+    }
+    return turbo_message_create_ex(address, data, size);
 }

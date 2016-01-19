@@ -18,8 +18,9 @@
 #pragma once
 
 #include <stdlib.h>
+#include "message.h"
 
-typedef struct 
+typedef struct
 {
 } turbo_in_stream_t;
 
@@ -67,3 +68,8 @@ int turbo_in_stream_read_int32(turbo_in_stream_t* stream, int32_t* dest);
  * Reads a 64 bit int from stream.
  */
 int turbo_in_stream_read_int64(turbo_in_stream_t* stream, int64_t* dest);
+
+/*
+ * Reads a message from stream
+ */
+turbo_message_t* turbo_in_stream_read_message(turbo_in_stream_t* stream);

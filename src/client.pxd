@@ -16,21 +16,16 @@
 
 include "common.pxi"
 
-from turbomq.lock cimport TurboWLock
-from turbomq.message cimport TurboMessage, turbo_message_t
-
 cdef class TurboClient:
     cdef object socket
     cdef dict queues
     cdef TurboWLock lock
     cdef public bytes url
     cdef int socket_fd
-    cdef public int64_t PUSH_COMMAND
-    cdef public int64_t POP_COMMAND
-    
+
     cdef int push(self, char* qname, char* topic, bytes data) except -1
     cdef TurboMessage pop(self, char* qname, char* topic, int8_t timeout)
-    cdef int _pop(self, char* qname, char* topic, int8_t timeout, turbo_message_t* message)
+    cdef turbo_message_t* _pop(self, char* qname, char* topic, int8_t timeout)
 
 cdef class TurboWQueue:
     cdef TurboClient client

@@ -13,54 +13,49 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+include "client.pyx"
+
 import multiprocessing
-import datetime
 
 class TurboException(Exception):
     pass
-    
+
 class TurboEmptyException(TurboException):
     pass
 
-cdef class TurboMessage:
-    def __cinit__(self, time_t creation_date, uint64_t address, bytes content):
-        self.content = content
-        self.address = bytes('127.0.0.1')
-        self.creation_date = creation_date
-    
 cdef class TurboEngine:
 
     def __cinit__(self, bytes host, int port, int num_threads):
         if num_threads <= 0:
             num_threads = multiprocessing.cpu_count() * 4
-            
+
         self.handle = turbo_engine_create('tcp', host, port, num_threads)
-        
+
     cdef turbo_queue_t* _get_queue(self, bytes name):
         return turbo_engine_get_queue(self.handle, name)
-        
+
     def run(self):
         cdef int result
         with nogil:
             result = turbo_engine_run(self.handle)
         return result
-        
+
     def stop(self):
         with nogil:
             turbo_engine_stop(self.handle)
 
     def get_queue(self, bytes name):
         return TurboQueue(self, name)
-        
+
     def destroy(self):
         with nogil:
             turbo_engine_destroy(&self.handle)
-        
+
 cdef class TurboQueue:
     def __cinit__(self, TurboEngine engine, bytes name):
         self.handle = engine._get_queue(name)
-        
-                    
+
+
     def push(self, bytes topic, bytes content):
         cdef char* temp = content
         cdef size_t size = len(content)
@@ -76,8 +71,8 @@ cdef class TurboQueue:
             if result == -1:
                 turbo_message_destroy(&message)
         if result == -1:
-            raise TurboException('Queue push error.')        
-        
+            raise TurboException('Queue push error.')
+
 
     def pop(self, bytes topic, int timeout):
         cdef turbo_message_t* message
@@ -95,4 +90,3 @@ cdef class TurboQueue:
         with nogil:
             turbo_message_destroy(&message)
         return result
-            

@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <time.h>
 
-typedef struct 
+typedef struct
 {
     time_t creation_date;
     uint64_t address;
