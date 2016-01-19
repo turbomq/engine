@@ -17,20 +17,24 @@ Installation is easy. You need to download or clone it and then type the python 
 # Usage
 To use **TurboMQ** just import and run the server. The following code runs a server for 10 minutes.
 
-> from turbomq import TurboEngine
-> import time
-> e = TurboEngine('tcp://127.0.0.1:33444')
-> e.run()
-> time.sleep(10.0 * 60)
-> e.stop()
-> e.destroy()
+```python
+from turbomq import TurboEngine
+import time
+e = TurboEngine('tcp://127.0.0.1:33444')
+e.run()
+time.sleep(10.0 * 60)
+e.stop()
+e.destroy()
+```
 
 This code sends a message to server and receives it again.
 
-> from turbomq import TurboClient
-> c = TurboClient('tcp://127.0.0.1:33444')
-> q = c.declare_queue('test')
-> q.push('hello', 'turbo') # Both topic key and data is mandatory in push
-> print(q.pop('hello', 1)) # In pop you need to determine a timeout
+```python
+from turbomq import TurboClient
+c = TurboClient('tcp://127.0.0.1:33444')
+q = c.declare_queue('test')
+q.push('hello', 'turbo') # Both topic key and data is mandatory in push
+print(q.pop('hello', 1)) # In pop you need to determine a timeout
+```
 
 # Future
