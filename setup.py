@@ -21,10 +21,10 @@ import os
 
 sources = ['src/turbomq.pyx',
            'src/fifo.c',
-           'src/engine.c', 
-           'src/queue.c', 
-           'src/linked_list.c', 
-           'src/utils.c', 
+           'src/engine.c',
+           'src/queue.c',
+           'src/linked_list.c',
+           'src/utils.c',
            'src/hashmap.c',
            'src/in_stream.c',
            'src/out_stream.c',
@@ -42,12 +42,13 @@ else:
     print 'Unsupported OS :('
 
 extensions = [
-    Extension('turbomq', 
-              sources, 
+    Extension('turbomq',
+              sources,
               include_dirs=['./include'])
 ]
 
 setup(
-    name = 'TurboMQ',
-    ext_modules = cythonize(extensions),
+    name='TurboMQ',
+    ext_modules=cythonize(extensions),
+    version='0.1.1'
 )

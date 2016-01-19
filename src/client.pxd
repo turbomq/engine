@@ -15,11 +15,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 include "common.pxi"
+include "common.pxd"
 
 cdef class TurboClient:
     cdef object socket
-    cdef dict queues
-    cdef TurboWLock lock
+    cdef object lock
     cdef public bytes url
     cdef int socket_fd
 

@@ -55,3 +55,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Cython generated files
+src/turbomq.c
+src/client.c
+src/common.c

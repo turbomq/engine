@@ -13,10 +13,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-include "common.pxi"
+include "client.pxd"
 
 cdef class TurboQueue
 cdef class TurboEngine
+
 
 cdef extern from "engine.h" nogil:
     ctypedef struct turbo_engine_t:
