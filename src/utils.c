@@ -40,11 +40,11 @@ char detect_host_endian(void)
 void print_system_error(void)
 {
     char buf[1024];
-    if(errno != 0)
+    if(errno != 0 && errno != 11)
     {
         memset(buf, 0, sizeof(buf));
         perror(buf);
-        printf("System error:%d:%s\n", errno, buf);
+        printf("System error:%d-%s\n", errno, buf);
     }
 }
 
@@ -96,7 +96,7 @@ int create_socket(const char* host, int port)
     struct sockaddr_in server_addr;
     int socketfd;
     int optval = 1;
-    
+
 
     /*
      * Create server socket. Specify the nonblocking socket option.
@@ -134,6 +134,6 @@ int create_socket(const char* host, int port)
     {
         return -1;
     }
-    
+
     return socketfd;
 }

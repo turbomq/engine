@@ -18,6 +18,7 @@ include "common.pyx"
 
 import socket
 import time
+from threading import Lock
 
 cdef int64_t PUSH_COMMAND = 0
 cdef int64_t POP_COMMAND = 1
@@ -63,6 +64,7 @@ cdef class TurboClient:
     def __cinit__(self, bytes url):
         self.socket = None
         self.url = url
+        self.lock = Lock()
         self.connect()
 
     def connect(self):
@@ -100,9 +102,13 @@ cdef class TurboClient:
             turbo_out_stream_append_str(out, topic)
             turbo_out_stream_append(out, &content_size, sizeof(int32_t))
             turbo_out_stream_append(out, content, content_size)
-            sent = turbo_out_stream_send(out)
-            if sent <= 0:
-                result = -1
+        with self.lock:
+            with nogil:
+                sent = turbo_out_stream_send(out)
+                if sent <= 0:
+                    result = -1
+
+        with nogil:
             turbo_out_stream_destroy(&out)
 
         return result
@@ -119,8 +125,13 @@ cdef class TurboClient:
             turbo_out_stream_append_str(out, qname)
             turbo_out_stream_append_str(out, topic)
             turbo_out_stream_append(out, &timeout, sizeof(int8_t))
-            if turbo_out_stream_send(out) <= 0:
-                result = -1
+
+        with self.lock:
+            with nogil:
+                if turbo_out_stream_send(out) <= 0:
+                    result = -1
+
+        with nogil:
             turbo_out_stream_destroy(&out)
 
         if result < 0:
@@ -128,8 +139,11 @@ cdef class TurboClient:
 
         input = turbo_in_stream_create(self.socket_fd)
 
+        with self.lock:
+            with nogil:
+                turbo_in_stream_recv(input);
+
         with nogil:
-            turbo_in_stream_recv(input);
             return turbo_in_stream_read_message(input)
 
     cdef TurboMessage pop(self, char* qname, char* topic, int8_t timeout):

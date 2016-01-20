@@ -27,7 +27,7 @@
 #include "array_list.h"
 #include "command.h"
 
-typedef struct 
+typedef struct
 {
     turbo_engine_t parent;
     turbo_hashmap_t* queues;
@@ -51,11 +51,9 @@ int engine_command_push(turbo_command_t* command, turbo_remote_client_t* client)
     turbo_message_t* message;
     turbo_queue_t* queue;
     turbo_engine_t* engine = turbo_command_get_context(command);
-    
+
     turbo_in_stream_read_str(client->in_stream, qname);
-    //printf("\tQueue:[%s].\n", qname);
     turbo_in_stream_read_str(client->in_stream, topic);
-    //printf("\tTopic:[%s].\n", topic);
     turbo_in_stream_read_int32(client->in_stream, &size);
     content = malloc(size);
     if(content == NULL)
@@ -65,7 +63,6 @@ int engine_command_push(turbo_command_t* command, turbo_remote_client_t* client)
         return -1;
     }
     turbo_in_stream_read(client->in_stream, content, size);
-    //printf("\tContent size:[%d].\n", size);
     queue = turbo_engine_get_queue(engine, qname);
     message = turbo_message_create_ex(client->ip, content, size);
     turbo_queue_push(queue, topic, message);
@@ -82,31 +79,28 @@ int engine_command_pop(turbo_command_t* command, turbo_remote_client_t* client)
     turbo_queue_t* queue;
     int result;
     turbo_engine_t* engine = turbo_command_get_context(command);
-    
+
     turbo_in_stream_read_str(client->in_stream, qname);
-    //printf("\tQueue:[%s].\n", qname);
     turbo_in_stream_read_str(client->in_stream, topic);
-    //printf("\tTopic:[%s].\n", topic);
     turbo_in_stream_read(client->in_stream, &timeout, sizeof(timeout));
-    //printf("\tTimeout:[%d].\n", timeout);
 
     queue = turbo_engine_get_queue(engine, qname);
     message = turbo_queue_pop(queue, topic, timeout);
-    
+
     if(client->out_stream != NULL)
     {
         turbo_out_stream_destroy(&client->out_stream);
     }
-    
+
     client->out_stream = turbo_out_stream_create(client->socketfd);
     if(client->out_stream == NULL)
     {
         print_system_error();
         return -1;
     }
-    
+
     result = turbo_out_stream_append_message(client->out_stream, message);
-    
+
     turbo_message_destroy(&message);
 
     if(result == -1)
@@ -114,7 +108,7 @@ int engine_command_pop(turbo_command_t* command, turbo_remote_client_t* client)
         print_system_error();
         return result;
     }
-    
+
     return 0;
 }
 
@@ -133,17 +127,17 @@ turbo_engine_t* turbo_engine_create(const char* protocol, const char* host, int 
     engine->ioloop = turbo_ioloop_create((turbo_engine_t*)engine, protocol, host, port, num_threads);
     engine->queues = turbo_hashmap_str_create();
     engine->commands = turbo_array_list_create(engine_release_command);
-    
+
     /*
      * Adding push command
      */
     turbo_array_list_append(engine->commands, turbo_command_create(0, engine_command_push, engine));
-    
+
     /*
      * Adding pop command
      */
     turbo_array_list_append(engine->commands, turbo_command_create(1, engine_command_pop, engine));
-    
+
     pthread_mutex_init(&engine->lock, NULL);
     return (turbo_engine_t*)engine;
 }
@@ -223,7 +217,7 @@ turbo_queue_t* turbo_engine_get_queue(turbo_engine_t* base, const char* name)
      * Locks the engine to create a new queue
      */
     pthread_mutex_lock(&engine->lock);
-    
+
     /*
      * We are going to double check it
      */
@@ -236,12 +230,11 @@ turbo_queue_t* turbo_engine_get_queue(turbo_engine_t* base, const char* name)
         queue = turbo_queue_create(name);
         turbo_hashmap_put(engine->queues, strdup(name), queue);
     }
-    
+
     /*
      * Unlock the engine
      */
     pthread_mutex_unlock(&engine->lock);
-    
+
     return queue;
 }
-
