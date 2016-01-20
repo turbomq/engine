@@ -1,4 +1,4 @@
-#    Copyright (C) 2016 abi <abisxir@gmail.com>
+#    Copyright (C) 2016 abi <abi@singiro.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
