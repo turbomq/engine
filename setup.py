@@ -52,13 +52,24 @@ long_description = open('README.md').read()
 setup(
     name='turbomq',
     ext_modules=cythonize(extensions),
-    version='0.1.3',
+    version='0.1.5',
     description='TurboMQ - Message Queue System',
     long_description=long_description,
     author='Abi M.Sangarab',
     author_email='abi@singiro.com',
-    url='https://github.com/turbomq/engine', # use the URL to the github repo
-    download_url='https://github.com/turbomq/engine/archive/0.1.3.tar.gz', # I'll explain this in a second
-    keywords=['queue', 'message', 'amqp'],
-    classifiers=[],
+    url='https://github.com/turbomq/engine',
+    download_url='https://github.com/turbomq/engine/archive/0.1.5.tar.gz', 
+    classifiers=[
+    'Development Status :: 3 - Alpha',
+    'License :: OSI Approved :: GNU General Public License',
+    'Programming Language :: Python :: 2.7',
+    'Topic :: Message Queue :: Message Processing',
+    ],
+    keywords='turbomq message queue amqp',
+    license='GNU General Public',
+    install_requires=[
+      'cython',
+    ],
+    include_package_data=True,
+    zip_safe=False
 )
