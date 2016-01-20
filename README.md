@@ -12,7 +12,14 @@ The most close (as queue functionality) system is **Redis**. It has a remarkable
 **TurboMQ** is a python module. To avoid GIL problems, it is developed using pure **C** and **Cython**. It uses its own event loop system. The benefit is that it is a real multi-threaded event loop and can exploit all available cores. The drawback is that it does not support windows. Are the bad news finished? No, kqueue has not implemented yet and it uses (slow) posix POLL in BSD families. Is there any other good news? Yes, windows and kqueue support is going to be implemented very soon.
 
 # Installation
-Installation is easy. You need to download or clone it and then type the python magic:
+Installation is easy. The package can be installed by pip:
+
+```bash
+$ sudo pip install turbomq
+```
+ 
+
+You need to download or clone it and then type the python magic:
 
 ```bash
 $ sudo python setup.py install

@@ -47,15 +47,18 @@ extensions = [
               include_dirs=['./include'])
 ]
 
+long_description = open('README.md').read()
+
 setup(
-    name='TurboMQ',
+    name='turbomq',
     ext_modules=cythonize(extensions),
-    version = '0.1.1',
-    description = 'Message Queue System',
-    author = 'Abi M.Sangarab',
-    author_email = 'abi@singiro.com',
-    url = 'https://github.com/turbomq/engine', # use the URL to the github repo
-    download_url = 'https://github.com/turbomq/engine/archive/0.1.1.tar.gz', # I'll explain this in a second
-    keywords = ['queue', 'message'],
-    classifiers = [],
+    version='0.1.3',
+    description='TurboMQ - Message Queue System',
+    long_description=long_description,
+    author='Abi M.Sangarab',
+    author_email='abi@singiro.com',
+    url='https://github.com/turbomq/engine', # use the URL to the github repo
+    download_url='https://github.com/turbomq/engine/archive/0.1.1.tar.gz', # I'll explain this in a second
+    keywords=['queue', 'message', 'amqp'],
+    classifiers=[],
 )
