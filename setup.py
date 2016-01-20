@@ -102,7 +102,7 @@ Installation is easy. The package can be installed by pip:
 
 $ sudo pip install turbomq
 
-You need to download or clone it and then type the python magic:
+Alternatively, you can download it or clone it directly from github and then type the python magic:
 
 $ sudo python setup.py install
 
